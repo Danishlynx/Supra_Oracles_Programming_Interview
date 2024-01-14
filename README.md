@@ -1,206 +1,110 @@
-# Foundry Template [![Open in Gitpod][gitpod-badge]][gitpod] [![Github Actions][gha-badge]][gha] [![Foundry][foundry-badge]][foundry] [![License: MIT][license-badge]][license]
+# Voting Smart Contract
 
-[gitpod]: https://gitpod.io/#https://github.com/PaulRBerg/foundry-template
-[gitpod-badge]: https://img.shields.io/badge/Gitpod-Open%20in%20Gitpod-FFB45B?logo=gitpod
-[gha]: https://github.com/PaulRBerg/foundry-template/actions
-[gha-badge]: https://github.com/PaulRBerg/foundry-template/actions/workflows/ci.yml/badge.svg
-[foundry]: https://getfoundry.sh/
-[foundry-badge]: https://img.shields.io/badge/Built%20with-Foundry-FFDB1C.svg
-[license]: https://opensource.org/licenses/MIT
-[license-badge]: https://img.shields.io/badge/License-MIT-blue.svg
+The **Voting** smart contract is designed to facilitate a secure and transparent voting process on the Ethereum blockchain. It provides a flexible and auditable platform for conducting elections, with features that enable administrators to add candidates and voters, manage the election lifecycle, and ensure the integrity of the voting process.
 
-A Foundry-based template for developing Solidity smart contracts, with sensible defaults.
+![Screenshot 2024-01-13 200551](https://github.com/Danishlynx/Supra_Oracles_Programming_Interview/assets/69537135/bbdcf558-45ed-49f6-8158-57b196e93c03)
+![Screenshot 2024-01-13 200456](https://github.com/Danishlynx/Supra_Oracles_Programming_Interview/assets/69537135/2894f745-6225-4a75-aae1-674191ade7ec)
 
-## What's Inside
 
-- [Forge](https://github.com/foundry-rs/foundry/blob/master/forge): compile, test, fuzz, format, and deploy smart
-  contracts
-- [Forge Std](https://github.com/foundry-rs/forge-std): collection of helpful contracts and cheatcodes for testing
-- [PRBTest](https://github.com/PaulRBerg/prb-test): modern collection of testing assertions and logging utilities
-- [Prettier](https://github.com/prettier/prettier): code formatter for non-Solidity files
-- [Solhint](https://github.com/protofire/solhint): linter for Solidity code
+## Table of Contents
 
-## Getting Started
-
-Click the [`Use this template`](https://github.com/PaulRBerg/foundry-template/generate) button at the top of the page to
-create a new repository with this repo as the initial state.
-
-Or, if you prefer to install the template manually:
-
-```sh
-$ mkdir my-project
-$ cd my-project
-$ forge init --template PaulRBerg/foundry-template
-$ bun install # install Solhint, Prettier, and other Node.js deps
-```
-
-If this is your first time with Foundry, check out the
-[installation](https://github.com/foundry-rs/foundry#installation) instructions.
+- [Features](#features)
+- [Functions Summary](#functions-summary)
+- [Modifiers](#modifiers)
+- [Contract Variables](#contract-variables)
+- [Detailed Function Descriptions](#detailed-function-descriptions)
+- [Usage Examples](#usage-examples)
+- [License](#license)
 
 ## Features
 
-This template builds upon the frameworks and libraries mentioned above, so please consult their respective documentation
-for details about their specific features.
+The **Voting** smart contract offers the following key features:
 
-For example, if you're interested in exploring Foundry in more detail, you should look at the
-[Foundry Book](https://book.getfoundry.sh/). In particular, you may be interested in reading the
-[Writing Tests](https://book.getfoundry.sh/forge/writing-tests.html) tutorial.
+### 1. Election State Management
 
-### Sensible Defaults
+- The contract maintains the state of the election, with three possible states: NOT_STARTED, ONGOING, and ENDED.
+- Only the admin can transition the election between these states, ensuring proper control over the voting process.
 
-This template comes with a set of sensible default configurations for you to use. These defaults can be found in the
-following files:
+### 2. Candidates and Voters
 
-```text
-├── .editorconfig
-├── .gitignore
-├── .prettierignore
-├── .prettierrc.yml
-├── .solhint.json
-├── foundry.toml
-└── remappings.txt
-```
+- Administrators can add candidates, each with a name and proposal, allowing candidates to present their election platforms.
+- Similarly, administrators can add voters with their names, providing transparency in the voter list.
 
-### VSCode Integration
+### 3. Delegation of Voting Rights
 
-This template is IDE agnostic, but for the best user experience, you may want to use it in VSCode alongside Nomic
-Foundation's [Solidity extension](https://marketplace.visualstudio.com/items?itemName=NomicFoundation.hardhat-solidity).
+- During an ongoing election, voters have the option to delegate their voting rights to another Ethereum address.
+- This delegation allows for a flexible voting mechanism where individuals can vote on behalf of others, accommodating various use cases.
 
-For guidance on how to integrate a Foundry project in VSCode, please refer to this
-[guide](https://book.getfoundry.sh/config/vscode).
+### 4. Casting Votes
 
-### GitHub Actions
+- Voters can cast their votes for specific candidates.
+- Each voter can only vote once, and their votes are counted toward the respective candidate's vote count.
 
-This template comes with GitHub Actions pre-configured. Your contracts will be linted and tested on every push and pull
-request made to the `main` branch.
+### 5. Election End and Winner Determination
 
-You can edit the CI script in [.github/workflows/ci.yml](./.github/workflows/ci.yml).
+- Once the election ends, the admin can determine the winning candidate based on the highest vote count.
+- The contract provides a function to display the winner's name, proposal, and the total number of votes received.
 
-## Installing Dependencies
+### 6. Voter Profile
 
-Foundry typically uses git submodules to manage dependencies, but this template uses Node.js packages because
-[submodules don't scale](https://twitter.com/PaulRBerg/status/1736695487057531328).
+- Voters can view their own profiles, including their name, the candidate they voted for, and whether they delegated their vote to another address.
+- Additionally, administrators have the privilege of viewing voter profiles for administrative purposes.
 
-This is how to install dependencies:
+### 7. Access Control
 
-1. Install the dependency using your preferred package manager, e.g. `bun install dependency-name`
-   - Use this syntax to install from GitHub: `bun install github:username/repo-name`
-2. Add a remapping for the dependency in [remappings.txt](./remappings.txt), e.g.
-   `dependency-name=node_modules/dependency-name`
+- The contract uses custom modifiers to ensure that only authorized individuals, such as the admin or voters who have not yet cast their votes during an ongoing election, can perform specific actions.
+- These modifiers enhance the security and integrity of the voting process.
 
-Note that OpenZeppelin Contracts is pre-installed, so you can follow that as an example.
+### 8. Event Emission
 
-## Writing Tests
+- Throughout the contract's lifecycle, events are emitted to provide transparency and traceability of actions. These events include contributions, candidate details, election results, and more.
 
-To write a new test contract, you start by importing [PRBTest](https://github.com/PaulRBerg/prb-test) and inherit from
-it in your test contract. PRBTest comes with a pre-instantiated [cheatcodes](https://book.getfoundry.sh/cheatcodes/)
-environment accessible via the `vm` property. If you would like to view the logs in the terminal output you can add the
-`-vvv` flag and use [console.log](https://book.getfoundry.sh/faq?highlight=console.log#how-do-i-use-consolelog).
+## Functions Summary
 
-This template comes with an example test contract [Foo.t.sol](./test/Foo.t.sol)
+Here is a summary of the contract's primary functions:
 
-## Usage
+- `addCandidate`: Allows the admin to add a candidate with a name and proposal.
+- `addVoter`: Allows the admin to add a voter with a name.
+- `startElection`: Starts the election, transitioning it to the ongoing state.
+- `displayCandidateDetails`: Displays details of a specific candidate.
+- `showWinner`: Displays the winner of the election after it has ended.
+- `delegateVotingRights`: Allows a voter to delegate their voting rights to another Ethereum address.
+- `vote`: Allows a voter to cast their vote for a specific candidate.
+- `endElection`: Ends the election, transitioning it to the ended state.
+- `showElectionResults`: Displays the vote count for a specific candidate after the election has ended.
+- `viewVoterProfile`: Allows a voter to view their own profile, including their name, voted candidate, and voting delegation status. The admin can also view voter profiles for administrative purposes.
 
-This is a list of the most frequently needed commands.
+## Modifiers
 
-### Build
+The contract uses custom modifiers to control access to specific functions. These modifiers include:
 
-Build the contracts:
+- `onlyAdmin`: Ensures that only the admin can perform certain actions.
+- `onlyVoter`: Restricts functions to voters who have not yet voted and are not the admin.
+- `onlyOngoingElection`: Allows functions to be executed only when the election is ongoing.
 
-```sh
-$ forge build
-```
+## Contract Variables
 
-### Clean
+The contract defines several contract-level variables, including:
 
-Delete the build artifacts and cache directories:
+- `admin`: The Ethereum address of the contract's administrator.
+- `voterIdCounter`: A counter to keep track of voter IDs.
+- `candidateIdCounter`: A counter to keep track of candidate IDs.
+- `voteCounter`: A counter to track the total number of votes cast.
+- `electionState`: An enumeration representing the current state of the election.
 
-```sh
-$ forge clean
-```
+## Detailed Function Descriptions
 
-### Compile
+For detailed descriptions of each function and their parameters, please refer to the [Detailed Function Descriptions](#detailed-function-descriptions) section in the contract's source code.
 
-Compile the contracts:
+## Usage Examples
 
-```sh
-$ forge build
-```
-
-### Coverage
-
-Get a test coverage report:
-
-```sh
-$ forge coverage
-```
-
-### Deploy
-
-Deploy to Anvil:
-
-```sh
-$ forge script script/Deploy.s.sol --broadcast --fork-url http://localhost:8545
-```
-
-For this script to work, you need to have a `MNEMONIC` environment variable set to a valid
-[BIP39 mnemonic](https://iancoleman.io/bip39/).
-
-For instructions on how to deploy to a testnet or mainnet, check out the
-[Solidity Scripting](https://book.getfoundry.sh/tutorials/solidity-scripting.html) tutorial.
-
-### Format
-
-Format the contracts:
-
-```sh
-$ forge fmt
-```
-
-### Gas Usage
-
-Get a gas report:
-
-```sh
-$ forge test --gas-report
-```
-
-### Lint
-
-Lint the contracts:
-
-```sh
-$ bun run lint
-```
-
-### Test
-
-Run the tests:
-
-```sh
-$ forge test
-```
-
-Generate test coverage and output result to the terminal:
-
-```sh
-$ bun run test:coverage
-```
-
-Generate test coverage with lcov report (you'll have to open the `./coverage/index.html` file in your browser, to do so
-simply copy paste the path):
-
-```sh
-$ bun run test:coverage:report
-```
-
-## Related Efforts
-
-- [abigger87/femplate](https://github.com/abigger87/femplate)
-- [cleanunicorn/ethereum-smartcontract-template](https://github.com/cleanunicorn/ethereum-smartcontract-template)
-- [foundry-rs/forge-template](https://github.com/foundry-rs/forge-template)
-- [FrankieIsLost/forge-template](https://github.com/FrankieIsLost/forge-template)
+Usage examples and code snippets demonstrating how to interact with the **Voting** smart contract can be found in the [Usage Examples](#usage-examples) section in the contract's source code.
 
 ## License
 
-This project is licensed under MIT.
+This smart contract is distributed under the [MIT License](LICENSE).
+
+For more detailed information about the contract's functions, usage, and examples, please refer to the contract's source code.
+
+---
+**Note:** The contract's actual source code is required to execute these functions on the Ethereum blockchain. This document serves as a high-level overview and documentation guide for the contract.
