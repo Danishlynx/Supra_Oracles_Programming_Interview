@@ -3,6 +3,10 @@
 
 The "MultiSigWallet" contract is designed to facilitate multi-signature wallet functionality, enhancing security for cryptocurrency management. It allows multiple designated owners to jointly control and authorize transactions. Owners are added during contract deployment, and a specified number of confirmations from these owners is required to execute a transaction. Each transaction is represented as a struct, encapsulating recipient, value, data, execution status, and confirmation count. Owners can submit transactions, confirm them, and revoke their confirmations if necessary. Once the required confirmations are met, an owner can execute a transaction, transferring funds or interacting with other contracts. This contract ensures transparent and secure multi-signature management of assets on the blockchain, providing an added layer of trust and control for digital asset holders.
 
+![Screenshot 2024-01-13 195020](https://github.com/Danishlynx/Supra_Oracles_Programming_Interview/assets/69537135/e09eaa10-0636-4e8b-a74e-6d96c51ecda2)
+![Screenshot 2024-01-13 191559](https://github.com/Danishlynx/Supra_Oracles_Programming_Interview/assets/69537135/d0d90bbd-dc19-43c5-9e62-040a2cc88baf)
+
+
 ## Functionality Focus on Multi-Signature Operations
 
 The contract is designed to require multiple confirmations from different owners before executing transactions. This enhances security, especially for high-value transactions, by distributing authority among several parties.
