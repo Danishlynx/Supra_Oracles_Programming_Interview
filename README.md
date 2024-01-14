@@ -1,206 +1,45 @@
-# Foundry Template [![Open in Gitpod][gitpod-badge]][gitpod] [![Github Actions][gha-badge]][gha] [![Foundry][foundry-badge]][foundry] [![License: MIT][license-badge]][license]
+# Contract Design Documentation
 
-[gitpod]: https://gitpod.io/#https://github.com/PaulRBerg/foundry-template
-[gitpod-badge]: https://img.shields.io/badge/Gitpod-Open%20in%20Gitpod-FFB45B?logo=gitpod
-[gha]: https://github.com/PaulRBerg/foundry-template/actions
-[gha-badge]: https://github.com/PaulRBerg/foundry-template/actions/workflows/ci.yml/badge.svg
-[foundry]: https://getfoundry.sh/
-[foundry-badge]: https://img.shields.io/badge/Built%20with-Foundry-FFDB1C.svg
-[license]: https://opensource.org/licenses/MIT
-[license-badge]: https://img.shields.io/badge/License-MIT-blue.svg
+## Functionality Focus on Multi-Signature Operations
 
-A Foundry-based template for developing Solidity smart contracts, with sensible defaults.
+The contract is designed to require multiple confirmations from different owners before executing transactions. This enhances security, especially for high-value transactions, by distributing authority among several parties.
 
-## What's Inside
+## Solidity Version Specification
 
-- [Forge](https://github.com/foundry-rs/foundry/blob/master/forge): compile, test, fuzz, format, and deploy smart
-  contracts
-- [Forge Std](https://github.com/foundry-rs/forge-std): collection of helpful contracts and cheatcodes for testing
-- [PRBTest](https://github.com/PaulRBerg/prb-test): modern collection of testing assertions and logging utilities
-- [Prettier](https://github.com/prettier/prettier): code formatter for non-Solidity files
-- [Solhint](https://github.com/protofire/solhint): linter for Solidity code
+The pragma directive (`pragma solidity >=0.8.23 <0.9.0;`) is set to ensure compatibility with Solidity compiler versions 0.8.23 and above but below 0.9.0. This ensures the use of recent language features while maintaining backward compatibility.
 
-## Getting Started
+## Use of Structs for Transaction Management
 
-Click the [`Use this template`](https://github.com/PaulRBerg/foundry-template/generate) button at the top of the page to
-create a new repository with this repo as the initial state.
+Transactions are represented as structs, encapsulating all relevant details (recipient, value, data, execution status, and confirmation count). This makes transaction management more efficient and organized.
 
-Or, if you prefer to install the template manually:
+## Event Emission for Key Actions
 
-```sh
-$ mkdir my-project
-$ cd my-project
-$ forge init --template PaulRBerg/foundry-template
-$ bun install # install Solhint, Prettier, and other Node.js deps
-```
+Events like `Deposit`, `SubmitTransaction`, `ConfirmTransaction`, `RevokeConfirmation`, and `ExecuteTransaction` are used to log significant activities on the blockchain. This aids in transparency and tracking of contract activities.
 
-If this is your first time with Foundry, check out the
-[installation](https://github.com/foundry-rs/foundry#installation) instructions.
+## Mapping for Ownership and Confirmation Tracking
 
-## Features
+Using a mapping for `isOwner` efficiently checks if an address is an owner. Similarly, a nested mapping (`isConfirmed`) is used to track confirmations of transactions by different owners. These structures are gas-efficient and simplify ownership and confirmation management.
 
-This template builds upon the frameworks and libraries mentioned above, so please consult their respective documentation
-for details about their specific features.
+## Access Control through Modifiers
 
-For example, if you're interested in exploring Foundry in more detail, you should look at the
-[Foundry Book](https://book.getfoundry.sh/). In particular, you may be interested in reading the
-[Writing Tests](https://book.getfoundry.sh/forge/writing-tests.html) tutorial.
+Custom modifiers (`onlyOwner`, `txExists`, `notExecuted`, `notConfirmed`) are used to control function execution based on ownership and transaction state. This helps in preventing unauthorized access and ensures that functions are executed under appropriate conditions.
 
-### Sensible Defaults
+## Constructor for Setting Initial State
 
-This template comes with a set of sensible default configurations for you to use. These defaults can be found in the
-following files:
+The constructor initializes the contract with a set of owners and the required number of confirmations. This approach ensures that the contract is ready for use immediately after deployment, with defined ownership and operational rules.
 
-```text
-├── .editorconfig
-├── .gitignore
-├── .prettierignore
-├── .prettierrc.yml
-├── .solhint.json
-├── foundry.toml
-└── remappings.txt
-```
+## Function Set for Transaction Lifecycle
 
-### VSCode Integration
+The contract includes a complete set of functions (`submitTransaction`, `confirmTransaction`, `executeTransaction`, `revokeConfirmation`) to manage the entire lifecycle of a transaction from creation to execution or revocation.
 
-This template is IDE agnostic, but for the best user experience, you may want to use it in VSCode alongside Nomic
-Foundation's [Solidity extension](https://marketplace.visualstudio.com/items?itemName=NomicFoundation.hardhat-solidity).
+## Safety Checks and Reverts
 
-For guidance on how to integrate a Foundry project in VSCode, please refer to this
-[guide](https://book.getfoundry.sh/config/vscode).
+The use of `require` statements ensures that functions are executed only when specific conditions are met. This includes checks for ownership, transaction existence, execution status, and confirmations, thereby preventing improper actions and enhancing contract security.
 
-### GitHub Actions
+## Public View Functions for Transparency
 
-This template comes with GitHub Actions pre-configured. Your contracts will be linted and tested on every push and pull
-request made to the `main` branch.
+Functions like `getOwners`, `getTransactionCount`, and `getTransaction` provide public read access to contract states such as the list of owners and transaction details, enhancing transparency.
 
-You can edit the CI script in [.github/workflows/ci.yml](./.github/workflows/ci.yml).
+## Fallback Function for Receiving Ether
 
-## Installing Dependencies
-
-Foundry typically uses git submodules to manage dependencies, but this template uses Node.js packages because
-[submodules don't scale](https://twitter.com/PaulRBerg/status/1736695487057531328).
-
-This is how to install dependencies:
-
-1. Install the dependency using your preferred package manager, e.g. `bun install dependency-name`
-   - Use this syntax to install from GitHub: `bun install github:username/repo-name`
-2. Add a remapping for the dependency in [remappings.txt](./remappings.txt), e.g.
-   `dependency-name=node_modules/dependency-name`
-
-Note that OpenZeppelin Contracts is pre-installed, so you can follow that as an example.
-
-## Writing Tests
-
-To write a new test contract, you start by importing [PRBTest](https://github.com/PaulRBerg/prb-test) and inherit from
-it in your test contract. PRBTest comes with a pre-instantiated [cheatcodes](https://book.getfoundry.sh/cheatcodes/)
-environment accessible via the `vm` property. If you would like to view the logs in the terminal output you can add the
-`-vvv` flag and use [console.log](https://book.getfoundry.sh/faq?highlight=console.log#how-do-i-use-consolelog).
-
-This template comes with an example test contract [Foo.t.sol](./test/Foo.t.sol)
-
-## Usage
-
-This is a list of the most frequently needed commands.
-
-### Build
-
-Build the contracts:
-
-```sh
-$ forge build
-```
-
-### Clean
-
-Delete the build artifacts and cache directories:
-
-```sh
-$ forge clean
-```
-
-### Compile
-
-Compile the contracts:
-
-```sh
-$ forge build
-```
-
-### Coverage
-
-Get a test coverage report:
-
-```sh
-$ forge coverage
-```
-
-### Deploy
-
-Deploy to Anvil:
-
-```sh
-$ forge script script/Deploy.s.sol --broadcast --fork-url http://localhost:8545
-```
-
-For this script to work, you need to have a `MNEMONIC` environment variable set to a valid
-[BIP39 mnemonic](https://iancoleman.io/bip39/).
-
-For instructions on how to deploy to a testnet or mainnet, check out the
-[Solidity Scripting](https://book.getfoundry.sh/tutorials/solidity-scripting.html) tutorial.
-
-### Format
-
-Format the contracts:
-
-```sh
-$ forge fmt
-```
-
-### Gas Usage
-
-Get a gas report:
-
-```sh
-$ forge test --gas-report
-```
-
-### Lint
-
-Lint the contracts:
-
-```sh
-$ bun run lint
-```
-
-### Test
-
-Run the tests:
-
-```sh
-$ forge test
-```
-
-Generate test coverage and output result to the terminal:
-
-```sh
-$ bun run test:coverage
-```
-
-Generate test coverage with lcov report (you'll have to open the `./coverage/index.html` file in your browser, to do so
-simply copy paste the path):
-
-```sh
-$ bun run test:coverage:report
-```
-
-## Related Efforts
-
-- [abigger87/femplate](https://github.com/abigger87/femplate)
-- [cleanunicorn/ethereum-smartcontract-template](https://github.com/cleanunicorn/ethereum-smartcontract-template)
-- [foundry-rs/forge-template](https://github.com/foundry-rs/forge-template)
-- [FrankieIsLost/forge-template](https://github.com/FrankieIsLost/forge-template)
-
-## License
-
-This project is licensed under MIT.
+A fallback function (`receive() external payable`) is implemented to allow the contract to receive Ether directly, which is essential for a wallet contract.
