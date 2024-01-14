@@ -1,206 +1,90 @@
-# Foundry Template [![Open in Gitpod][gitpod-badge]][gitpod] [![Github Actions][gha-badge]][gha] [![Foundry][foundry-badge]][foundry] [![License: MIT][license-badge]][license]
+### Explanation of the Smart Contracts
 
-[gitpod]: https://gitpod.io/#https://github.com/PaulRBerg/foundry-template
-[gitpod-badge]: https://img.shields.io/badge/Gitpod-Open%20in%20Gitpod-FFB45B?logo=gitpod
-[gha]: https://github.com/PaulRBerg/foundry-template/actions
-[gha-badge]: https://github.com/PaulRBerg/foundry-template/actions/workflows/ci.yml/badge.svg
-[foundry]: https://getfoundry.sh/
-[foundry-badge]: https://img.shields.io/badge/Built%20with-Foundry-FFDB1C.svg
-[license]: https://opensource.org/licenses/MIT
-[license-badge]: https://img.shields.io/badge/License-MIT-blue.svg
+#### TokenABC.sol and TokenXYZ.sol (ERC20 Tokens)
 
-A Foundry-based template for developing Solidity smart contracts, with sensible defaults.
+1. **Purpose**: Both `TokenABC` and `TokenXYZ` are ERC20 tokens representing two different cryptocurrencies.
 
-## What's Inside
+2. **Contract Components**:
+   - `tokenPrice`: The price of a single token in terms of Ether.
+   - `tokensSold`: Tracks the total number of tokens sold.
+   - `mul(uint256, uint256)`: A utility function for safe multiplication, ensuring no overflow occurs.
+   - `buyTokens(uint256)`: Allows users to buy tokens by sending Ether. The function checks if the contract has enough tokens and if the sent Ether matches the required amount.
 
-- [Forge](https://github.com/foundry-rs/foundry/blob/master/forge): compile, test, fuzz, format, and deploy smart
-  contracts
-- [Forge Std](https://github.com/foundry-rs/forge-std): collection of helpful contracts and cheatcodes for testing
-- [PRBTest](https://github.com/PaulRBerg/prb-test): modern collection of testing assertions and logging utilities
-- [Prettier](https://github.com/prettier/prettier): code formatter for non-Solidity files
-- [Solhint](https://github.com/protofire/solhint): linter for Solidity code
+3. **Token Minting**: In the constructor, a specified initial supply of tokens is minted to the contract itself.
 
-## Getting Started
+4. **Token Buying**: Users can buy tokens by calling `buyTokens`, which transfers tokens from the contract to the buyer, and increases `tokensSold`.
 
-Click the [`Use this template`](https://github.com/PaulRBerg/foundry-template/generate) button at the top of the page to
-create a new repository with this repo as the initial state.
+5. **Max Approval**: `approveMax` sets the maximum possible allowance for another address, simplifying token spending approval.
 
-Or, if you prefer to install the template manually:
+#### TokenSwap.sol
 
-```sh
-$ mkdir my-project
-$ cd my-project
-$ forge init --template PaulRBerg/foundry-template
-$ bun install # install Solhint, Prettier, and other Node.js deps
-```
+1. **Purpose**: `TokenSwap` allows users to swap between `TokenABC` and `TokenXYZ`.
 
-If this is your first time with Foundry, check out the
-[installation](https://github.com/foundry-rs/foundry#installation) instructions.
+2. **Contract Components**:
+   - `admin`: The administrator of the contract, typically the deployer.
+   - `ratioAX`: The exchange ratio between `TokenABC` and `TokenXYZ`.
+   - `fees`: The fee percentage charged for swaps.
+   - `tokenABC` and `tokenXYZ`: References to the `TokenABC` and `TokenXYZ` contracts.
+   - `TokensSwapped` event: Emitted after a successful token swap.
 
-## Features
+3. **Constructor**: Sets up the contract with addresses of `TokenABC` and `TokenXYZ`.
 
-This template builds upon the frameworks and libraries mentioned above, so please consult their respective documentation
-for details about their specific features.
+4. **Admin-Only Functions**: `setRatio` and `setFees` are restricted to the `admin` and allow changing the swap ratio and fee percentage.
 
-For example, if you're interested in exploring Foundry in more detail, you should look at the
-[Foundry Book](https://book.getfoundry.sh/). In particular, you may be interested in reading the
-[Writing Tests](https://book.getfoundry.sh/forge/writing-tests.html) tutorial.
+5. **Swap Functions**:
+   - `swapTKA`: Swaps `TokenABC` for `TokenXYZ` based on the set ratio and fees.
+   - `swapTKX`: Swaps `TokenXYZ` for `TokenABC` based on the set ratio and fees.
 
-### Sensible Defaults
+6. **Checking Balances**: `getTokenBalances` provides the balance of both tokens for a specific user.
 
-This template comes with a set of sensible default configurations for you to use. These defaults can be found in the
-following files:
+7. **Buying Tokens**: `buyTokensABC` and `buyTokensXYZ` allow the admin to buy tokens from the respective token contracts.
 
-```text
-├── .editorconfig
-├── .gitignore
-├── .prettierignore
-├── .prettierrc.yml
-├── .solhint.json
-├── foundry.toml
-└── remappings.txt
-```
+### Design Principles
 
-### VSCode Integration
+1. **Modularity**: Each contract (TokenABC, TokenXYZ, TokenSwap) has a specific role, following the principle of single responsibility.
 
-This template is IDE agnostic, but for the best user experience, you may want to use it in VSCode alongside Nomic
-Foundation's [Solidity extension](https://marketplace.visualstudio.com/items?itemName=NomicFoundation.hardhat-solidity).
+2. **Security**:
+   - Using `require` statements for input validation, ensuring conditions like sufficient balances and allowances.
+   - Using `onlyAdmin` modifier for admin-restricted functions.
 
-For guidance on how to integrate a Foundry project in VSCode, please refer to this
-[guide](https://book.getfoundry.sh/config/vscode).
+3. **Interoperability**: The `TokenSwap` contract interacts with `TokenABC` and `TokenXYZ` contracts, demonstrating contract-to-contract interaction.
 
-### GitHub Actions
+4. **Transparency and Events**:
+   - Emitting events (`TokensSwapped`, `RatioChanged`, `FeesChanged`) for important actions, enhancing transparency and traceability.
+   - The `getTokenBalances` function provides a view into token holdings, adding to the transparency.
 
-This template comes with GitHub Actions pre-configured. Your contracts will be linted and tested on every push and pull
-request made to the `main` branch.
+5.
 
-You can edit the CI script in [.github/workflows/ci.yml](./.github/workflows/ci.yml).
+**Safety Features**:
+   - The `mul` function in the token contracts ensures safe arithmetic operations.
+   - ERC20 standard functions provide a secure and standard way to handle token operations.
+   - The use of `payable` for Ether transactions in token buying functions.
 
-## Installing Dependencies
+6. **Upgradeability and Maintenance**:
+   - The ability for the admin to adjust fees and exchange ratios allows for adaptability in response to market conditions or operational needs.
+   - However, the contracts do not implement upgradeability patterns (like proxies), suggesting they are intended to be fixed once deployed.
 
-Foundry typically uses git submodules to manage dependencies, but this template uses Node.js packages because
-[submodules don't scale](https://twitter.com/PaulRBerg/status/1736695487057531328).
+7. **User Autonomy**: 
+   - `approveMax` simplifies user interaction by allowing them to set maximum approval in one transaction.
+   - Users have control over their tokens and must explicitly approve the `TokenSwap` contract to access their funds.
 
-This is how to install dependencies:
+8. **Gas Efficiency**:
+   - The contracts could be optimized for gas usage. For instance, the `buyTokens` functions could be optimized to reduce transaction costs.
+   - Repeated code (like the `mul` function) could be abstracted into a library for reuse.
 
-1. Install the dependency using your preferred package manager, e.g. `bun install dependency-name`
-   - Use this syntax to install from GitHub: `bun install github:username/repo-name`
-2. Add a remapping for the dependency in [remappings.txt](./remappings.txt), e.g.
-   `dependency-name=node_modules/dependency-name`
+9. **Error Handling**:
+   - The contracts use `require` statements effectively to revert transactions when conditions are not met, preventing erroneous or malicious actions.
+   - Custom error messages provide clarity on why a transaction failed.
 
-Note that OpenZeppelin Contracts is pre-installed, so you can follow that as an example.
+10. **Decentralization and Trust**:
+    - The design implies a level of trust in the `admin`, as they have the power to change critical parameters.
+    - A more decentralized approach might include governance mechanisms for these changes.
 
-## Writing Tests
+### Interconnectivity Between Contracts
 
-To write a new test contract, you start by importing [PRBTest](https://github.com/PaulRBerg/prb-test) and inherit from
-it in your test contract. PRBTest comes with a pre-instantiated [cheatcodes](https://book.getfoundry.sh/cheatcodes/)
-environment accessible via the `vm` property. If you would like to view the logs in the terminal output you can add the
-`-vvv` flag and use [console.log](https://book.getfoundry.sh/faq?highlight=console.log#how-do-i-use-consolelog).
+- **Token Swap Mechanism**: `TokenSwap` serves as an intermediary, allowing users to exchange `TokenABC` for `TokenXYZ` and vice versa. It relies on the ERC20 standard's `transfer` and `transferFrom` methods.
+- **Price and Supply Management**: The token contracts manage their own supplies and pricing, independent of the swap mechanism.
+- **Administrative Control**: The `TokenSwap` contract has functions that can only be called by the `admin`, linking administrative control directly to the deployer of the contract.
+- **Token Approval**: Users must approve the `TokenSwap` contract to spend their tokens (ABC or XYZ) before they can initiate a swap.
 
-This template comes with an example test contract [Foo.t.sol](./test/Foo.t.sol)
-
-## Usage
-
-This is a list of the most frequently needed commands.
-
-### Build
-
-Build the contracts:
-
-```sh
-$ forge build
-```
-
-### Clean
-
-Delete the build artifacts and cache directories:
-
-```sh
-$ forge clean
-```
-
-### Compile
-
-Compile the contracts:
-
-```sh
-$ forge build
-```
-
-### Coverage
-
-Get a test coverage report:
-
-```sh
-$ forge coverage
-```
-
-### Deploy
-
-Deploy to Anvil:
-
-```sh
-$ forge script script/Deploy.s.sol --broadcast --fork-url http://localhost:8545
-```
-
-For this script to work, you need to have a `MNEMONIC` environment variable set to a valid
-[BIP39 mnemonic](https://iancoleman.io/bip39/).
-
-For instructions on how to deploy to a testnet or mainnet, check out the
-[Solidity Scripting](https://book.getfoundry.sh/tutorials/solidity-scripting.html) tutorial.
-
-### Format
-
-Format the contracts:
-
-```sh
-$ forge fmt
-```
-
-### Gas Usage
-
-Get a gas report:
-
-```sh
-$ forge test --gas-report
-```
-
-### Lint
-
-Lint the contracts:
-
-```sh
-$ bun run lint
-```
-
-### Test
-
-Run the tests:
-
-```sh
-$ forge test
-```
-
-Generate test coverage and output result to the terminal:
-
-```sh
-$ bun run test:coverage
-```
-
-Generate test coverage with lcov report (you'll have to open the `./coverage/index.html` file in your browser, to do so
-simply copy paste the path):
-
-```sh
-$ bun run test:coverage:report
-```
-
-## Related Efforts
-
-- [abigger87/femplate](https://github.com/abigger87/femplate)
-- [cleanunicorn/ethereum-smartcontract-template](https://github.com/cleanunicorn/ethereum-smartcontract-template)
-- [foundry-rs/forge-template](https://github.com/foundry-rs/forge-template)
-- [FrankieIsLost/forge-template](https://github.com/FrankieIsLost/forge-template)
-
-## License
-
-This project is licensed under MIT.
+The contracts work together to create an ecosystem where users can purchase tokens and then swap them, while an admin oversees the swap mechanics. The design is centralized around the admin's capabilities, with a clear separation of concerns among the contracts.
