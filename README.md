@@ -17,3 +17,7 @@ The "MyTokenSale" contract is designed to facilitate a token sale with both a pr
 - **Events:** The contract emits events for various actions, such as contributions, token distributions, and refunds, providing transparency and traceability of contract activities.
 
 The contract ensures a controlled and secure token sale process, with well-defined caps, contribution limits, and a refund mechanism in case the minimum cap is not reached. Users can participate in the sale by sending Ether, and the contract mints and distributes tokens accordingly. The owner has full control over starting and ending sale phases, distributing tokens, and monitoring the contract's status.
+
+![Screenshot 2024-01-14 010245](https://github.com/Danishlynx/Supra_Oracles_Programming_Interview/assets/69537135/3ae06259-95d7-4312-a04c-b5457be3a73f)
+![Screenshot 2024-01-14 010222](https://github.com/Danishlynx/Supra_Oracles_Programming_Interview/assets/69537135/c84a73c4-a2cf-4bce-9c30-90b4202f9bb7)
+
