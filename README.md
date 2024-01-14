@@ -117,13 +117,5 @@ The "Voting" smart contract has been meticulously designed with a focus on ensur
 Collectively, these design choices empower the "Voting" smart contract to conduct elections with the utmost fairness, security, and transparency. The use of enumerations, structs, mappings, and access control modifiers enhances code organization and efficiency, making the contract more robust and comprehensible. Additionally, the contract's ability to handle voting delegation, precise vote counting, and event emission further solidifies its suitability for conducting elections in a wide range of contexts.
 ## Usage Examples
 
-Usage examples and code snippets demonstrating how to interact with the **Voting** smart contract can be found in the [Usage Examples](#usage-examples) section in the contract's source code.
 
-## License
 
-This smart contract is distributed under the [MIT License](LICENSE).
-
-For more detailed information about the contract's functions, usage, and examples, please refer to the contract's source code.
-
----
-**Note:** The contract's actual source code is required to execute these functions on the Ethereum blockchain. This document serves as a high-level overview and documentation guide for the contract.
